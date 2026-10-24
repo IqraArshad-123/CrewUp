@@ -1,0 +1,51 @@
+{
+  "name": "@crewup/server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/src/index.js",
+    "worker": "tsx src/worker.ts",
+    "start:worker": "node dist/src/worker.js",
+    "test": "tsx --test tests/integration.test.ts",
+    "test:redis": "tsx --test tests/redis.test.ts",
+    "seed": "tsx scripts/seed.ts",
+    "preflight": "tsx scripts/preflight.ts",
+    "maintenance": "tsx scripts/maintenance.ts",
+    "db:test": "tsx scripts/database.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1156.0",
+    "@aws-sdk/s3-request-presigner": "3.1156.0",
+    "bcryptjs": "3.0.3",
+    "bullmq": "6.4.0",
+    "cookie-parser": "1.4.7",
+    "dotenv": "17.4.2",
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.1",
+    "helmet": "8.3.0",
+    "ioredis": "6.0.0",
+    "jsonwebtoken": "9.0.3",
+    "mongoose": "8.24.7",
+    "nodemailer": "10.2.1",
+    "pdf-lib": "1.17.1",
+    "pdf-parse": "2.4.5",
+    "rate-limit-redis": "6.0.1",
+    "zod": "4.6.7",
+    "@crewup/shared": "*"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "1.4.10",
+    "@types/express": "5.0.6",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "22.20.5",
+    "@types/nodemailer": "8.0.2",
+    "@types/supertest": "6.0.3",
+    "mongodb-memory-server": "10.4.3",
+    "supertest": "7.3.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

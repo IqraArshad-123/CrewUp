@@ -1,0 +1,25 @@
+name: Verify CrewUp
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Start isolated databases
+        run: |
+          docker run -d --name crewup-mongo -p 27018:27018 mongo:7 --replSet crewup --bind_ip_all --port 27018
+          docker run -d --name crewup-redis -p 6379:6379 redis:7.4-alpine
+          for i in $(seq 1 30); do docker exec crewup-mongo mongosh --port 27018 --quiet --eval 'db.runCommand({ping:1})' && break; sleep 1; done
+          docker exec crewup-mongo mongosh --port 27018 --quiet --eval 'rs.initiate({_id:"crewup",members:[{_id:0,host:"localhost:27018"}]})'
+          for i in $(seq 1 30); do docker exec crewup-mongo mongosh --port 27018 --quiet --eval 'if(!db.hello().isWritablePrimary)quit(1)' && break; sleep 1; done
+      - run: npm test
+      - run: npm run test:redis
+        env:
+          REDIS_INTEGRATION_URL: redis://127.0.0.1:6379
+      - run: npm run build:api && npm run build
+      - run: docker build -t crewup:verified .

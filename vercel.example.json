@@ -1,0 +1,53 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "web": {
+      "root": "client",
+      "framework": "nextjs",
+      "installCommand": "cd .. && npm ci",
+      "buildCommand": "cd .. && npm run build"
+    },
+    "api": {
+      "root": "server",
+      "framework": "express",
+      "entrypoint": "src/vercel.ts",
+      "installCommand": "cd .. && npm ci && npm run build:shared"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/health",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/ready",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ],
+  "daemons": {
+    "worker": {
+      "root": ".",
+      "entrypoint": "Dockerfile.worker",
+      "instances": {
+        "iad1": 1
+      },
+      "terminationGracePeriodSeconds": 35
+    }
+  }
+}

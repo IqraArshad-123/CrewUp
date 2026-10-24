@@ -1,0 +1,24 @@
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+COPY shared/package.json ./shared/package.json
+RUN npm ci
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build:api
+
+FROM node:24-bookworm-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+COPY shared/package.json ./shared/package.json
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build --chown=node:node /app/shared/dist ./shared/dist
+COPY --from=build --chown=node:node /app/server/dist ./server/dist
+RUN mkdir -p /app/server/.data/private && chown -R node:node /app/server/.data
+USER node
+CMD ["npm", "run", "start:worker"]

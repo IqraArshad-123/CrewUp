@@ -1,0 +1,45 @@
+{
+  "name": "crewup",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "npm run dev --workspace @crewup/client",
+    "dev:api": "npm run dev --workspace @crewup/server",
+    "build:shared": "npm run build --workspace @crewup/shared",
+    "build": "npm run build --workspace @crewup/client",
+    "build:api": "npm run build --workspace @crewup/server",
+    "typecheck": "npm run typecheck --workspace @crewup/client && npm run typecheck --workspace @crewup/server",
+    "start:web": "npm run start --workspace @crewup/client",
+    "start:api": "npm run start --workspace @crewup/server",
+    "test": "npm run test --workspace @crewup/server",
+    "test:redis": "npm run test:redis --workspace @crewup/server",
+    "seed": "npm run seed --workspace @crewup/server",
+    "preflight": "npm run preflight --workspace @crewup/server",
+    "maintenance": "npm run maintenance --workspace @crewup/server",
+    "worker": "npm run worker --workspace @crewup/server",
+    "start:worker": "npm run start:worker --workspace @crewup/server",
+    "predev": "npm run build:shared",
+    "predev:web": "npm run build:shared",
+    "predev:api": "npm run build:shared",
+    "prebuild": "npm run build:shared",
+    "prebuild:api": "npm run build:shared",
+    "pretypecheck": "npm run build:shared",
+    "pretest": "npm run build:shared",
+    "pretest:redis": "npm run build:shared",
+    "preseed": "npm run build:shared",
+    "preworker": "npm run build:shared"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "dotenv": "17.4.2"
+  }
+}

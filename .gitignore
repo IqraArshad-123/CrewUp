@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.env
+.env.local
+.env.*
+!.env.example
+dist/
+.data/
+*.log
+*.tsbuildinfo
+next-env.d.ts
+
+legacy-build/
+
+.refactor-cache/

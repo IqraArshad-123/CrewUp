@@ -1,0 +1,62 @@
+services:
+  api:
+    build: .
+    command: ["npm", "run", "start:api"]
+    env_file: server/.env.production
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 4100
+      REDIS_URL: redis://redis:6379
+      PRIVATE_FILES_DIR: /app/server/.data/private
+    volumes:
+      - private_files:/app/server/.data/private
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4100/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  worker:
+    build: .
+    command: ["npm", "run", "start:worker"]
+    env_file: server/.env.production
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      PRIVATE_FILES_DIR: /app/server/.data/private
+    volumes:
+      - private_files:/app/server/.data/private
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+  web:
+    build: .
+    environment:
+      NODE_ENV: production
+      API_URL: http://api:4100
+      APP_URL: ${APP_URL:?Set APP_URL in the deployment environment}
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  redis_data:
+  private_files:
